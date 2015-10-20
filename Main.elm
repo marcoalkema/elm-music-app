@@ -15,18 +15,18 @@ drawbeam = collage 1000 600
                    , xAxis
                    ]
 
-nootjes = [0, 1, 2, 3, 4, 5, 6, 7, 8, -1, -2]
+nootjes = [0, 0, 5, 5, 6, 6, 5]
 
-noteVertical x y = if x (>) 26 then
-                    noteUp
+noteVertical x y = if ((y > 19.5) == True) then
+                    noteUp x y
                    else
-                    noteDown
+                    noteDown x y
           
-noteUp x y   = eightNoteUp |> move (30 * toFloat x, y)
-noteDown x y = halfNoteUp |> move (30 * toFloat x, y)
+noteUp x y   = halfNoteDown |> move (30 * toFloat x, y)
+noteDown x y = halfNoteUp   |> move (30 * toFloat x, y)
                
 yAxis = map (\x -> x * 6.5) nootjes
-xAxis = group (indexedMap (\i y -> noteUp i y) yAxis)
+xAxis = group (indexedMap (\i y -> noteVertical i y) yAxis)
 
 -- Quarter Notes
         
@@ -101,4 +101,3 @@ clearGrey = rgba 122 122 122 1
   
 clearBlack : Color
 clearBlack = rgba 000 000 000 1
-# elm-music-app
