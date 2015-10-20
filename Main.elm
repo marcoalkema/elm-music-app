@@ -17,7 +17,9 @@ drawbeam = collage 1000 600
 
 nootjes = [0, 0, 5, 5, 6, 6, 5]
 
-noteVertical x y = if ((y > 19.5) == True) then
+notePivot = \y -> y > 19.5
+
+noteVertical x y = if notePivot y then
                     noteUp x y
                    else
                     noteDown x y
@@ -89,10 +91,10 @@ staff  = group (indexedMap (\i y-> (beam |> move (0, 13 * toFloat i ))) (repeat 
 staff2 = group (indexedMap (\i y-> (beam |> move (0, -78  + 13 * toFloat i ))) (repeat 5 []))
 
 -- Get note and octave from MIDI-note number
-notes = [60, 62, 64]
-z = 62
-getNote = z % 12
-getOctave = (z - (z % 12)) // 12
+-- notes = [60, 62, 64]
+-- z = 62
+-- getNote = z % 12
+-- getOctave = (z - (z % 12)) // 12
 
 
 -- Colors
