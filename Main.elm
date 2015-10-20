@@ -15,17 +15,17 @@ drawbeam = collage 1000 600
                    , xAxis
                    ]
 
-nootjes = [0, 0, 5, 5, 6, 6, 5]
+nootjes = [0, 0, 4, 5, 6, 6, 5]
 
-notePivot = \y -> y > 19.5
+notePivot y = y > 19.5
 
 noteVertical x y = if notePivot y then
                     noteUp x y
                    else
                     noteDown x y
-          
-noteUp x y   = halfNoteDown |> move (30 * toFloat x, y)
-noteDown x y = halfNoteUp   |> move (30 * toFloat x, y)
+spaceBetweenNotes x y = move (30 * toFloat x, y)          
+noteUp x y   = eightNoteDown |> spaceBetweenNotes x y
+noteDown x y = eightNoteUp   |> spaceBetweenNotes x y
                
 yAxis = map (\x -> x * 6.5) nootjes
 xAxis = group (indexedMap (\i y -> noteVertical i y) yAxis)
@@ -91,6 +91,7 @@ staff  = group (indexedMap (\i y-> (beam |> move (0, 13 * toFloat i ))) (repeat 
 staff2 = group (indexedMap (\i y-> (beam |> move (0, -78  + 13 * toFloat i ))) (repeat 5 []))
 
 -- Get note and octave from MIDI-note number
+
 -- notes = [60, 62, 64]
 -- z = 62
 -- getNote = z % 12
