@@ -1,17 +1,17 @@
 import Html exposing (text)
+import String exposing (fromList)
 import List exposing (..)
 import Color exposing (..)
 import Graphics.Collage exposing (..)
 import Graphics.Element exposing (..)
 
 main : Element
-main = drawbeam
+main = show snip
 
 -- drawMusic = List.append staff notesList
 
 drawbeam = collage 1000 600
-                   [ staff2
-                   , staff
+                   [ staves
                    , xAxis
                    ]
 
@@ -69,14 +69,25 @@ noteFlag        = polygon noteFlagPoly
                   |> scale 0.2
                   |> move (-365,64)                  
 
-                   
+-- Functie moet eerste set (coordinaten) van de lijst nemen als startpunt.
+-- Functie moet door de lijst itereren en het verschil tussen de huidige en de volgende set berekenen en deze omzetten in negatieve waarden (spiegeling).
+-- 
+-- Stap 1: Verschil tussen twee sets berekenen en deze omzetten in eigen set
+-- 
+
+unzipper   = (unzip noteFlagPoly)
+firstList  = fst unzipper
+secondList = snd unzipper
+snip = map2 (+) (head firstList) (tail(head firstList))
+       
+
 wholeNote       = group [noteHead, noteHeadWhole]
 halfNoteUp      = group [noteHead, noteHeadHalf, noteBeamUp]
 halfNoteDown    = group [noteHead, noteHeadHalf, noteBeamDown]
 quarterNoteUp   = group [noteHead, noteBeamUp]
 quarterNoteDown = group [noteHead, noteBeamDown]
-eightNoteUp   = group [noteHead, noteBeamUp,   noteFlag]
-eightNoteDown = group [noteHead, noteBeamDown, noteFlag]
+eightNoteUp     = group [noteHead, noteBeamUp,   noteFlag]
+eightNoteDown   = group [noteHead, noteBeamDown, noteFlag]
 
 -- Individual beams for staff.
 
@@ -87,8 +98,9 @@ beam     = rect 6300 13
 
 -- Create staves
            
-staff  = group (indexedMap (\i y-> (beam |> move (0, 13 * toFloat i ))) (repeat 5 []))
-staff2 = group (indexedMap (\i y-> (beam |> move (0, -78  + 13 * toFloat i ))) (repeat 5 []))
+staff offset = group (indexedMap (\i y-> (beam |> move (0, offset +  13 * toFloat i ))) (repeat 5 []))
+staves = group [staff 0, staff -78]
+
 
 -- Get note and octave from MIDI-note number
 
