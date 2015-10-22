@@ -6,16 +6,21 @@ import Graphics.Collage exposing (..)
 import Graphics.Element exposing (..)
 
 main : Element
-main = drawbeam
+main = drawMusic
 
--- drawMusic = List.append staff notesList
+-- Draw form elements
 
-drawbeam = collage 1000 600
+drawMusic = collage 1000 600
                    [ staves
-                   , xAxis
+                   , drawNotes
                    ]
 
+-- MELODY INPUT
+           
 nootjes = [0, 0, 4, 5, 6, 6, 5]
+
+
+-- Define vertical note direction through pivot (The note B, or middle beam on staff)
 
 notePivot y = y > 19.5
 
@@ -23,13 +28,19 @@ noteVertical x y = if notePivot y then
                     noteUp x y
                    else
                     noteDown x y
+                             
 spaceBetweenNotes x y = move (30 * toFloat x, y)          
 noteUp x y   = eightNoteDown |> spaceBetweenNotes x y
 noteDown x y = eightNoteUp   |> spaceBetweenNotes x y
-               
-yAxis = map (\x -> x * 6.5) nootjes
-xAxis = group (indexedMap (\i y -> noteVertical i y) yAxis)
 
+-- Every step up or down in melody equals 6.5 up or down on canvas (Vertical draw)
+                            
+notesHorizontalAlign = map (\x -> x * 6.5) nootjes
+
+-- Group notes in one form
+        
+drawNotes = group (indexedMap (\i y -> noteVertical i y) notesHorizontalAlign)
+                            
 -- Draw notes/note-elements
         
 noteHeadWhole   = oval 45 30
