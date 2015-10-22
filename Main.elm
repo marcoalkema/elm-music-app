@@ -6,7 +6,7 @@ import Graphics.Collage exposing (..)
 import Graphics.Element exposing (..)
 
 main : Element
-main = show snip
+main = drawbeam
 
 -- drawMusic = List.append staff notesList
 
@@ -30,7 +30,7 @@ noteDown x y = eightNoteUp   |> spaceBetweenNotes x y
 yAxis = map (\x -> x * 6.5) nootjes
 xAxis = group (indexedMap (\i y -> noteVertical i y) yAxis)
 
--- Quarter Notes
+-- Draw notes/note-elements
         
 noteHeadWhole   = oval 45 30
                 |> filled white
@@ -55,7 +55,8 @@ noteBeamDown    = rect 13 160
                 |> filled clearBlack
                 |> move (-455.9,46)
                 |> scale 0.2
-noteFlagPoly      = [ (-400, 165)
+noteFlagUpPoly      : List (Float, Float)                   
+noteFlagUpPoly    = [ (-400, 165)
                   , (-350 , 120)
                   , (-350 , 55)
                   , (-380 , 30)
@@ -63,31 +64,24 @@ noteFlagPoly      = [ (-400, 165)
                   , (-360 , 60) 
                   , (-360 , 55)
                   , (-360 , 105)
-                  , (-400 , 130) ] 
-noteFlag        = polygon noteFlagPoly
-                  |> filled clearBlack
-                  |> scale 0.2
-                  |> move (-365,64)                  
+                  , (-400 , 130) ]
+noteFlagDownPoly  = map (\(x,y) -> (x, 0-y)) noteFlagUpPoly
+noteFlag updown x y = polygon updown
+                     |> filled clearBlack
+                     |> scale 0.2
+                     |> move (-365 - x,64 - y)
+noteFlagUp          = noteFlag noteFlagUpPoly 0 0
+noteFlagDown        = noteFlag noteFlagDownPoly 10 1
 
--- Functie moet eerste set (coordinaten) van de lijst nemen als startpunt.
--- Functie moet door de lijst itereren en het verschil tussen de huidige en de volgende set berekenen en deze omzetten in negatieve waarden (spiegeling).
--- 
--- Stap 1: Verschil tussen twee sets berekenen en deze omzetten in eigen set
--- 
-
-unzipper   = (unzip noteFlagPoly)
-firstList  = fst unzipper
-secondList = snd unzipper
-snip = map2 (+) (head firstList) (tail(head firstList))
-       
-
+-- Group individual note elements
+                      
 wholeNote       = group [noteHead, noteHeadWhole]
 halfNoteUp      = group [noteHead, noteHeadHalf, noteBeamUp]
 halfNoteDown    = group [noteHead, noteHeadHalf, noteBeamDown]
 quarterNoteUp   = group [noteHead, noteBeamUp]
 quarterNoteDown = group [noteHead, noteBeamDown]
-eightNoteUp     = group [noteHead, noteBeamUp,   noteFlag]
-eightNoteDown   = group [noteHead, noteBeamDown, noteFlag]
+eightNoteUp     = group [noteHead, noteBeamUp,   noteFlagUp]
+eightNoteDown   = group [noteHead, noteBeamDown, noteFlagDown]
 
 -- Individual beams for staff.
 
