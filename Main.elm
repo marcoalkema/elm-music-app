@@ -75,10 +75,11 @@ noteFlag        = polygon noteFlagPoly
 -- Stap 1: Verschil tussen twee sets berekenen en deze omzetten in eigen set
 -- 
 
-unzipper   = (unzip noteFlagPoly)
-firstList  = fst unzipper
-secondList = snd unzipper
-snip = map2 (+) (head firstList) (tail(head firstList))
+xys  : List (Int, Int)
+xys  = unzip noteFlagPoly
+xs   = fst xys
+ys   = snd xys
+snip = map2 (+) (head xs) (tail (head xs))
        
 
 wholeNote       = group [noteHead, noteHeadWhole]
