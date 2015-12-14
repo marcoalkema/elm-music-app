@@ -26,7 +26,7 @@ noteVertical x y = if notePivot y then
                    else
                     noteDown x y
 
-notePivot y = y > 19.5
+notePivot y = y < -300
                              
 noteUp x y   = quarterNoteDown |> spaceBetweenNotes x y
 noteDown x y = quarterNoteUp   |> spaceBetweenNotes x y

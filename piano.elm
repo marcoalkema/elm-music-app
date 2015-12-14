@@ -9,12 +9,18 @@ import Notation exposing (..)
 
 -- MODEL
 
-init : (Int, (Int, Int), List (Int, Int))
+init : Model
 init = (5, (0,0), [(0, 0)])
 
-type MusicType = OctaveNumber Int
+type alias Note' = Int
+type alias Quaver = Int
+type alias Octave = Int
+type alias OctaveAmount = Int
+type alias Model = (OctaveAmount, (Note', Octave), List (Note', Octave))                        
+       
+type MusicType = OctaveNumber OctaveAmount
                | Note         (Note', Octave)
-               | Duration     Int
+               | Duration     Quaver
                | NotatedNotes (List Int)
            
 type Note = NoteC | NoteCis | NoteD | NoteDis | NoteE | NoteF | NoteFis | NoteG | NoteGis | NoteA | NoteAis | NoteB
@@ -23,19 +29,15 @@ type Event = OctaveNumberEvent   MusicType
            | KeyPressedEvent     MusicType
            | DurationButtonEvent MusicType
 
-type alias Model = (Int, (Int, Int), List (Int, Int))
-type alias Note' = Int
-type alias Octave = Int
-
 -- UPDATE
 
 update : Event -> Model -> Model
 update action (currentOctaveAmount, currentNote, currentNotationList)  = case action of
                                                                            OctaveNumberEvent   (OctaveNumber oct)    -> (oct, currentNote, currentNotationList) 
                                                                            KeyPressedEvent     (Note (newNote, oct)) -> (currentOctaveAmount, (newNote, oct), newNotationList oct newNote currentNotationList)
-                                                                           DurationButtonEvent (Duration quaver)     -> (currentOctaveAmount, currentNote, currentNotationList)
+                                                                           DurationButtonEvent (Duration duration)     -> (currentOctaveAmount, currentNote, currentNotationList)
 
-newNotationList : Int -> Int -> List (Int, Int) -> List (Int, Int)
+newNotationList : Octave -> Note' -> List (Note', Octave) -> List (Note', Octave)
 newNotationList noteOctave note currentNotationList = take 22 ((noteOctave, note)::currentNotationList)
 
 noteToString : Note -> Int
@@ -65,19 +67,23 @@ view address (currentOctaveAmount, (note, octave), notationList) =
                        , button [onClick address (OctaveNumberEvent (OctaveNumber 3)), buttonStyle] [text "3"]
                        , button [onClick address (OctaveNumberEvent (OctaveNumber 4)), buttonStyle] [text "4"]                 
                        , button [onClick address (OctaveNumberEvent (OctaveNumber 5)), buttonStyle] [text "5"]
+                       , button [onClick address (DurationButtonEvent (Duration 1)), durationButtonStyle] [text "1/8"]
+                       , button [onClick address (DurationButtonEvent (Duration 2)), durationButtonStyle] [text "1/4"]
+                       , button [onClick address (DurationButtonEvent (Duration 3)), durationButtonStyle] [text "1/2"]
+                       , button [onClick address (DurationButtonEvent (Duration 4)), durationButtonStyle] [text "1"]                 
                        , div [notationStyle'] [fromElement (drawMusic notationList)]
                        ]
                          
-drawOctave : Address Event -> Int -> Html
+drawOctave : Address Event -> Octave -> Html
 drawOctave address octave = div [containerStyle] (drawKeys address octave)
 
 drawOctaves : Address Event -> Octave -> List Html
 drawOctaves address currentOctaveAmount  = map (\octave -> drawOctave address octave) (octaves currentOctaveAmount)
 
-octaves : Int -> List Int
+octaves : Octave -> List Octave
 octaves n = [1..(max 1 (abs n))]            
             
-octaveNumber : Int
+octaveNumber : Octave
 octaveNumber = 5
                
 whiteKeyWidth : Float
@@ -175,17 +181,32 @@ notationStyle =
 buttonStyle : Attribute
 buttonStyle =
   style
-    [ ("height", "104px")
+    [ ("height", "70px")
     , ("width", "60px")
     , ("background-color", "#ddd")
     , ("border", "2px solid #aaa")
-    , ("top", "200px")
+    , ("top", "150px")
     , ("position", "relative")
-    , ("font-size", "72px")
+    , ("font-size", "50px")
     , ("float", "left")
     , ("left", "10px")
     , ("z-index", "4")  
     ]
+
+durationButtonStyle : Attribute
+durationButtonStyle =
+  style
+    [ ("height", "70px")
+    , ("width", "70px")
+    , ("background-color", "#ddd")
+    , ("border", "2px solid #aaa")
+    , ("top", "164px")
+    , ("position", "relative")
+    , ("font-size", "40px")
+    , ("float", "left")
+    , ("left", "10px")
+    , ("z-index", "4")  
+    ]  
 
 notationStyle' : Attribute
 notationStyle' =
@@ -193,7 +214,7 @@ notationStyle' =
     [ ("height", "360px")
     , ("width", "98%")
     , ("border", "2px solid #aaa")
-    , ("top", "210px")
+    , ("top", "172px")
     , ("position", "relative")
     , ("font-size", "72px")
     , ("float", "left")
