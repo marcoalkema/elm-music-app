@@ -5,20 +5,10 @@ import Html.Attributes exposing (style)
 import Html.Events exposing (onClick, onKeyDown)
 import List exposing (..)
 import Signal exposing (Address)
-import StartApp.Simple exposing (start)
 import Notation exposing (..)
 
-
-main : Signal Html
-main =
-  start
-    { model = init
-    , update = update
-    , view = view
-    }
-
-
 -- MODEL
+
 init : (Int, (Int, Int), List (Int, Int))
 init = (5, (0,0), [(0, 0)])
 
