@@ -19,20 +19,24 @@ drawNotes : List (Int, Int) -> Form
 drawNotes notationList = group (indexedMap (\i y -> noteVertical i y) (notesHorizontalAlign notationList))
 
 notesHorizontalAlign : List (Int, Int) -> List Float
-notesHorizontalAlign notationList = map (\(octave, note) -> (6.5 * toFloat note) + (6.5 * (12 * toFloat octave))) notationList
+notesHorizontalAlign = map (\(octave, note) -> (6.5 * toFloat note) + (6.5 * (12 * toFloat octave)))
 
-noteVertical x y = if notePivot y then
-                    noteUp x y
+noteVertical : Int -> Float -> Form
+noteVertical y = if notePivot y then
+                    noteUp y
                    else
-                    noteDown x y
+                    noteDown y
 
-notePivot y = y < -300
-                             
+notePivot : comparable -> Bool        
+notePivot y = y > 137
+
+noteUp : Int -> Float -> Form
 noteUp x y   = quarterNoteDown |> spaceBetweenNotes x y
+noteDown : Int -> Float -> Form
 noteDown x y = quarterNoteUp   |> spaceBetweenNotes x y
 
+spaceBetweenNotes : Int -> Float -> Form -> Form
 spaceBetweenNotes x y = move (30 * toFloat x, y)          
-
 
 -- Notation Elements                           
         
@@ -69,7 +73,7 @@ noteFlagUpPoly    = [ (-400, 165)
                   , (-360 , 55)
                   , (-360 , 105)
                   , (-400 , 130) ]
-noteFlagDownPoly  = map (\(x,y) -> (x, 0-y)) noteFlagUpPoly
+noteFlagDownPoly  = map (\(x,y) -> (x, 0 - y)) noteFlagUpPoly
 noteFlag updown x y = polygon updown
                      |> filled clearBlack
                      |> scale 0.2

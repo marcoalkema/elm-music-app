@@ -9,3 +9,6 @@ main =
     , update = update
     , view = view
     }
+
+init : Model
+init = (5, (0,0), [(0, 0)])  
