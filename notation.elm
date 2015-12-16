@@ -13,7 +13,7 @@ type Duration = Eight
                | Quarter
                | Half
                | Whole         
-
+                 
 drawMusic notationList = collage 1400 400
                    [ staves
                      |> scale 1.7
@@ -24,36 +24,36 @@ drawMusic notationList = collage 1400 400
                    ]
 
 drawNotes : List (Octave, Note, Duration) -> Form
-drawNotes notationList = group (indexedMap (\horizontalIndex (verticalPosition, duration) -> noteVerticalAlign horizontalIndex verticalPosition duration ) (notesHorizontalAlign notationList))
+drawNotes notationList = group (indexedMap (\horizontalIndex (verticalPosition, duration) -> noteVerticalAlign verticalPosition horizontalIndex duration ) (notesHorizontalAlign notationList))
 
 notesHorizontalAlign : List (Octave, Note, Duration) -> List (Float, Duration)
 notesHorizontalAlign = map (\(octave, note, duration) -> ((6.5 * toFloat note) + (6.5 * (12 * toFloat octave)), duration))
 
-noteVerticalAlign : Int -> Float -> Duration -> Form
-noteVerticalAlign horizontalIndex verticalPosition duration = if verticalPosition > notePivot then
-                                                                noteUp horizontalIndex verticalPosition duration
+noteVerticalAlign : Float -> Int -> Duration -> Form
+noteVerticalAlign verticalPosition = if verticalPosition > notePivot then
+                                                                noteUp verticalPosition 
                                                               else
-                                                                noteDown horizontalIndex verticalPosition duration
-                                                                         
+                                                                noteDown verticalPosition
+
 notePivot : Float
 notePivot  = 137
 
-noteUp : Int -> Float -> Duration -> Form
-noteUp horizontalPosition verticalPosition duration = case duration of
-                                                        Eight   -> eightNoteDown   |> spaceBetweenNotes horizontalPosition verticalPosition
-                                                        Quarter -> quarterNoteDown |> spaceBetweenNotes horizontalPosition verticalPosition
-                                                        Half    -> halfNoteDown    |> spaceBetweenNotes horizontalPosition verticalPosition
-                                                        Whole   -> wholeNote       |> spaceBetweenNotes horizontalPosition verticalPosition
+noteUp : Float -> Int -> Duration -> Form
+noteUp verticalPosition horizontalPosition duration = case duration of
+                                                        Eight   -> eightNoteDown   |> spaceBetweenNotes verticalPosition horizontalPosition
+                                                        Quarter -> quarterNoteDown |> spaceBetweenNotes verticalPosition horizontalPosition
+                                                        Half    -> halfNoteDown    |> spaceBetweenNotes verticalPosition horizontalPosition
+                                                        Whole   -> wholeNote       |> spaceBetweenNotes verticalPosition horizontalPosition
                                                                  
-noteDown : Int -> Float -> Duration -> Form
-noteDown horizontalPosition verticalPosition duration = case duration of
-                                                          Eight   -> eightNoteUp |> spaceBetweenNotes horizontalPosition verticalPosition
-                                                          Quarter -> quarterNoteUp |> spaceBetweenNotes horizontalPosition verticalPosition
-                                                          Half    -> halfNoteUp  |> spaceBetweenNotes horizontalPosition verticalPosition  
-                                                          Whole   -> wholeNote   |> spaceBetweenNotes horizontalPosition verticalPosition  
+noteDown : Float -> Int -> Duration -> Form
+noteDown verticalPosition horizontalPosition duration = case duration of
+                                                          Eight   -> eightNoteUp   |> spaceBetweenNotes verticalPosition horizontalPosition
+                                                          Quarter -> quarterNoteUp |> spaceBetweenNotes verticalPosition horizontalPosition
+                                                          Half    -> halfNoteUp    |> spaceBetweenNotes verticalPosition horizontalPosition
+                                                          Whole   -> wholeNote     |> spaceBetweenNotes verticalPosition horizontalPosition
                                                                      
-spaceBetweenNotes : Int -> Float -> Form -> Form
-spaceBetweenNotes horizontalPosition verticalPosition = move (30 * toFloat horizontalPosition, verticalPosition)          
+spaceBetweenNotes : Float -> Int -> Form -> Form
+spaceBetweenNotes verticalPosition horizontalPosition = move (30 * toFloat horizontalPosition, verticalPosition)          
 
 -- Notation Elements                           
         
