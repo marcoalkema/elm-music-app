@@ -3,16 +3,10 @@ module Notation where
 import List exposing (..)
 import Color exposing (..)
 import Graphics.Collage exposing (..)
+import Types exposing (..)
 
 -- Draw form elements
 
-type alias Octave = Int
-type alias Note = Int
-
-type Duration = Eight
-               | Quarter
-               | Half
-               | Whole         
                  
 drawMusic notationList = collage 1400 400
                    [ staves
@@ -23,34 +17,29 @@ drawMusic notationList = collage 1400 400
                      |> move (170, -385)
                    ]
 
-drawNotes : List (Octave, Note, Duration) -> Form
-drawNotes notationList = group (indexedMap (\horizontalIndex (verticalPosition, duration) -> noteVerticalAlign verticalPosition horizontalIndex duration ) (notesHorizontalAlign notationList))
+drawNotes : List Note -> Form
+drawNotes notationList = group (indexedMap (\horizontalIndex (verticalPosition, duration) -> noteVerticalAlign (notePivot verticalPosition) duration |> spaceBetweenNotes verticalPosition horizontalIndex) (notesHorizontalAlign notationList))
 
-notesHorizontalAlign : List (Octave, Note, Duration) -> List (Float, Duration)
+notesHorizontalAlign : List Note -> List (Float, Duration)
 notesHorizontalAlign = map (\(octave, note, duration) -> ((6.5 * toFloat note) + (6.5 * (12 * toFloat octave)), duration))
 
-noteVerticalAlign : Float -> Int -> Duration -> Form
-noteVerticalAlign verticalPosition = if verticalPosition > notePivot then
-                                                                noteUp verticalPosition 
-                                                              else
-                                                                noteDown verticalPosition
+noteVerticalAlign : Bool -> Duration -> Form
+noteVerticalAlign isNotePivot duration =
+  if isNotePivot then
+    case duration of
+      Eighth  -> eightNoteDown
+      Quarter -> quarterNoteDown
+      Half    -> halfNoteDown
+      Whole   -> wholeNote       
+  else
+    case duration of
+      Eighth  -> eightNoteUp
+      Quarter -> quarterNoteUp
+      Half    -> halfNoteUp
+      Whole   -> wholeNote
 
-notePivot : Float
-notePivot  = 137
-
-noteUp : Float -> Int -> Duration -> Form
-noteUp verticalPosition horizontalPosition duration = case duration of
-                                                        Eight   -> eightNoteDown   |> spaceBetweenNotes verticalPosition horizontalPosition
-                                                        Quarter -> quarterNoteDown |> spaceBetweenNotes verticalPosition horizontalPosition
-                                                        Half    -> halfNoteDown    |> spaceBetweenNotes verticalPosition horizontalPosition
-                                                        Whole   -> wholeNote       |> spaceBetweenNotes verticalPosition horizontalPosition
-                                                                 
-noteDown : Float -> Int -> Duration -> Form
-noteDown verticalPosition horizontalPosition duration = case duration of
-                                                          Eight   -> eightNoteUp   |> spaceBetweenNotes verticalPosition horizontalPosition
-                                                          Quarter -> quarterNoteUp |> spaceBetweenNotes verticalPosition horizontalPosition
-                                                          Half    -> halfNoteUp    |> spaceBetweenNotes verticalPosition horizontalPosition
-                                                          Whole   -> wholeNote     |> spaceBetweenNotes verticalPosition horizontalPosition
+notePivot : comparable -> Bool
+notePivot verticalPosition = verticalPosition > 137
                                                                      
 spaceBetweenNotes : Float -> Int -> Form -> Form
 spaceBetweenNotes verticalPosition horizontalPosition = move (30 * toFloat horizontalPosition, verticalPosition)          

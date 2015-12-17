@@ -2,30 +2,16 @@ module Piano where
 
 import Html exposing (..)
 import Html.Attributes exposing (style)
-import Html.Events exposing (onClick, onKeyDown)
+import Html.Events exposing (..)
 import List exposing (..)
 import Signal exposing (Address)
 import Notation exposing (..)
+import Types exposing (..)
 
 -- MODEL
 
 init : Model
 init = (5, (0,0, Quarter), [(0, 0, Quarter)])
-
-type alias OctaveNumber = Int
-type alias NoteNumber   = Int
-type alias Octave       = Int
-
-type alias Note = (Octave, NoteNumber, Duration)
-
-type Event = OctaveNumberEvent   OctaveNumber
-           | KeyPressedEvent     Note
-           | DurationButtonEvent Duration
-
-type alias Model = (OctaveNumber, Note, List Note)
-
-type alias IsBlack = Bool
-type Note' = NoteC | NoteCis | NoteD | NoteDis | NoteE | NoteF | NoteFis | NoteG | NoteGis | NoteA | NoteAis | NoteB
 
 -- UPDATE
 
@@ -65,15 +51,15 @@ view : Address Event -> Model -> Html
 view address (currentOctaveAmount, (octave, note, duration), notationList) =
   div [containerStyle] [ div [containerStyle] (drawOctaves address currentOctaveAmount)
                        , div [notationStyle]  [text (toString (currentOctaveAmount, (octave, note), notationList))]
-                       , button [onClick address (OctaveNumberEvent (1)), buttonStyle] [text "1"]
-                       , button [onClick address (OctaveNumberEvent (2)), buttonStyle] [text "2"]
-                       , button [onClick address (OctaveNumberEvent (3)), buttonStyle] [text "3"]
-                       , button [onClick address (OctaveNumberEvent (4)), buttonStyle] [text "4"]
-                       , button [onClick address (OctaveNumberEvent (5)), buttonStyle] [text "5"]
-                       , button [onClick address (DurationButtonEvent (Eight)), durationButtonStyle] [text "1/8"]
-                       , button [onClick address (DurationButtonEvent (Quarter)), durationButtonStyle] [text "1/4"]
-                       , button [onClick address (DurationButtonEvent (Half)), durationButtonStyle] [text "1/2"]
-                       , button [onClick address (DurationButtonEvent (Whole)), durationButtonStyle] [text "1"]
+                       , button [onClick address (OctaveNumberEvent 1), buttonStyle] [text "1"]
+                       , button [onClick address (OctaveNumberEvent 2), buttonStyle] [text "2"]
+                       , button [onClick address (OctaveNumberEvent 3), buttonStyle] [text "3"]
+                       , button [onClick address (OctaveNumberEvent 4), buttonStyle] [text "4"]
+                       , button [onClick address (OctaveNumberEvent 5), buttonStyle] [text "5"]
+                       , button [onClick address (DurationButtonEvent Eighth), durationButtonStyle] [text "1/8"]
+                       , button [onClick address (DurationButtonEvent Quarter), durationButtonStyle] [text "1/4"]
+                       , button [onClick address (DurationButtonEvent Half), durationButtonStyle] [text "1/2"]
+                       , button [onClick address (DurationButtonEvent Whole), durationButtonStyle] [text "1"]
                        , div [notationStyle'] [fromElement (drawMusic notationList)]
                        ]
 
@@ -123,7 +109,7 @@ drawKeys : Address Event -> Octave -> List Html
 drawKeys address octave = map (\(position, isBlack, note) -> drawKey address (position, isBlack, note) octave) positions
 
 drawKey : Address Event -> (Float, Bool, Note') -> Octave -> Html
-drawKey address (position, isBlack, note) octave = (div [onClick address (KeyPressedEvent (octave, (noteToInt note), Quarter)), styles isBlack position octave] [])
+drawKey address (position, isBlack, note) octave = (div [onMouseDown address (KeyPressedEvent (octave, (noteToInt note), Quarter)), styles isBlack position octave] [])
 
 styles : Bool -> Float -> Int -> Attribute
 styles isBlack = if isBlack then styleBlack else styleWhite
