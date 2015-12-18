@@ -18,16 +18,16 @@ init = (5, (0,0, Quarter), [(0, 0, Quarter)])
 update : Event -> Model -> Model
 update action (currentOctaveAmount, (currentOctave, currentNote, currentDuration), currentNotationList)  = case action of
                                                                                                              OctaveNumberEvent   octave                      -> (octave,              (currentOctave, currentNote, currentDuration), currentNotationList)
-                                                                                                             KeyPressedEvent     (octave, newNote, duration) -> (currentOctaveAmount, (octave, newNote, currentDuration),            newNotationList octave newNote duration currentNotationList)
-                                                                                                             DurationButtonEvent noteValue                   -> (currentOctaveAmount, (currentOctave, currentNote, noteValue),       addDurationToNotationList currentOctave currentNote noteValue currentNotationList)
+                                                                                                             KeyPressedEvent     (octave, newNote, duration) -> (currentOctaveAmount, (octave, newNote, currentDuration),            newNotationList (octave, newNote, duration) currentNotationList)
+                                                                                                             DurationButtonEvent noteValue                   -> (currentOctaveAmount, (currentOctave, currentNote, noteValue),       addDurationToNotationList noteValue currentNotationList)
 
-newNotationList : Octave -> NoteNumber -> Duration -> List Note -> List Note
-newNotationList noteOctave note noteValue currentNotationList = take 22 ((noteOctave, note, noteValue)::currentNotationList)
+newNotationList : Note -> List Note -> List Note
+newNotationList (noteOctave, note, noteValue) currentNotationList = take 22 ((noteOctave, note, noteValue)::currentNotationList)
 
-addDurationToNotationList : Octave -> NoteNumber -> Duration -> List Note -> List Note
-addDurationToNotationList noteOctave note noteValue currentNotationList = case currentNotationList of
+addDurationToNotationList : Duration -> List Note -> List Note
+addDurationToNotationList noteValue currentNotationList = case currentNotationList of
                                                                             []                                          -> []
-                                                                            (octave, note', duration)::tailNotationList -> (octave, note, noteValue)::tailNotationList
+                                                                            (octave, note, duration)::tailNotationList -> (octave, note, noteValue)::tailNotationList
 
 noteToInt : Note' -> Int
 noteToInt note =
@@ -108,7 +108,7 @@ positions = [pos0, pos1, pos2, pos3, pos4, pos5, pos6, pos7, pos8, pos9, pos10, 
 drawKeys : Address Event -> Octave -> List Html
 drawKeys address octave = map (\(position, isBlack, note) -> drawKey address (position, isBlack, note) octave) positions
 
-drawKey : Address Event -> (Float, Bool, Note') -> Octave -> Html
+drawKey : Address Event -> (Float, IsBlack, Note') -> Octave -> Html
 drawKey address (position, isBlack, note) octave = (div [onMouseDown address (KeyPressedEvent (octave, (noteToInt note), Quarter)), styles isBlack position octave] [])
 
 styles : Bool -> Float -> Int -> Attribute
